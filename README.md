@@ -15,4 +15,4 @@ If you have expo installed on your phone scan the barcode in to run app.
 View in simulator:
 If you are on a mac press 'i' to run in ios simulator
 
-> This project is **tested only on ios**
+> This project is tested on ios only
