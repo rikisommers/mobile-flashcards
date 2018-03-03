@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet ,Platform,TextInput, KeyboardA
 import {timeToString} from '../utils/helpers'
 import { purple, white } from '../utils/colors'
 import styled from 'styled-components/native'
-import {addDeck} from "../actions/index"
+import { addDeck } from "../actions/index"
 import { submitDeck } from '../utils/api'
 
 // test PLatform & styled components
@@ -66,9 +66,10 @@ class AddDeckView extends Component {
       console.log('on submit',key,deck)
   
         if(key){
-        submitDeck({ key,deck })
-        this.setState({ key: 'enter deck title' })
-        this.props.navigation.navigate('DeckView', {deck: this.state })
+        submitDeck({ key,deck });
+
+        this.setState({ key: 'enter deck title' });
+        this.props.navigation.navigate('DeckView', {deck: this.state });
         }else{
         alert('enter a title fool')
         }

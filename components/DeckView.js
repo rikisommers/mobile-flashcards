@@ -22,11 +22,11 @@ class DeckView extends Component {
         
     }
     
-    static navigationOptions = ({ navigation }) => {
-        //const { title } = navigation.state.params.deck.title
-        //console.log(title)
+    static navigationOptions = () => {
+
+        console.log('deck title',this.props)
         return {
-          title: "FUUUCK"
+         title: 'deck view'
           
         }
     }

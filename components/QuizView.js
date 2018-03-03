@@ -42,19 +42,49 @@ height: 200;
 background-color:#fff
 color:#000;
 `
-//var {height, width} = Dimensions.get('window');
-//let ScreenHeight = Dimensions.get("window").height;
-// const QuizCard = styled.Card`
-// width:100%;
-// height:100%;
-// bbackground-color:red;
-// `
 
-// const QuizCard_Title = styled.Text`
-// font-size:14px;
-// font-weight:300;
-// color:#fff;
-// `
+
+const CardCard = styled.View`
+background-color: '#FE474C',
+border-radius: 5,
+width: 100%;
+transform-style: preserve-3d;
+transform-origin:center;
+
+`
+
+const CardContentWrap = styled.View`
+margin: 0;
+display: block;
+position:relative;
+perspective: 800px;
+width: 100%;
+height:200;
+`
+const CardQuestion = styled.View`
+width: 100%;
+height:200;
+backgroundColor: red;
+position:absolute;
+top:0;
+backface-visibility: hidden;
+`
+
+
+const CardAnswer = styled.View`
+width: 100%;
+height:200;
+position:absolute;
+top:0;
+left:0;
+right:0;
+background: blue;
+color:#fff;
+z-index:99;
+transform:rotateY(180deg);
+`
+
+
 class MyButton extends React.Component {
   render() {
     return (
@@ -68,12 +98,9 @@ class MyButton extends React.Component {
 
 class QuizView extends Component {
 
-
-
   constructor(props) {
     super(props)
     const cards  = this.props.navigation.state.params.cards
-    this.rotY = new Animated.Value(0)
     this.state = {
       cards:cards,
       totalCards: cards.length,
@@ -82,16 +109,30 @@ class QuizView extends Component {
       quizCompleted:false,
       status:false,
       answer:false,
+      animCard: new Animated.Value(0),
     }
     this.checkResult = this.checkResult.bind(this)
   }
+
+  _currentCard = 0;
 
   componentDidMount(){
     console.log('deck',this.props)
   }
 
   toggleStatus(){
-    this.setState({status:!this.state.status})
+      this._currentCard = this._currentCard ? 0 : 3;
+
+      Animated.timing(this.state.animCard, {
+      duration: 600, 
+      toValue: this._currentCard,
+      useNativeDriver: true,
+      }).start();
+
+      setTimeout(() =>{
+        this.setState({status:!this.state.status})
+      }, 300)
+
   }
 
   showCorrect(){
@@ -135,14 +176,19 @@ class QuizView extends Component {
 
       if(val === JSON.parse(cards[cCard].TF)){
         this.showCorrect()
+
+        this.setState({
+          totalCorrect: totalCorrect + 1,
+        })
+
       }else{
         this.showIncorrect()
       }
-      this.fin()
-      // this.setState({
-      //   quizCompleted:true,
-      //  // currentCard : 0
-      // })
+
+      setTimeout(() =>{
+        this.fin()
+      }, 1000)
+
 
     }else{
 
@@ -163,6 +209,11 @@ class QuizView extends Component {
         
       }
     }
+    if(this.state.status != false){
+      this.toggleStatus()
+    }
+
+
     console.log(this.state)
   }
 
@@ -170,10 +221,29 @@ class QuizView extends Component {
     const { totalCards, currentCard, status, quizCompleted, totalCorrect } = this.state
     const cards = this.props.navigation.state.params.cards
     const cCard = this.state.cCard
-    const res = ((totalCorrect + 1) * 100) / totalCards;
-    const st = this.state
+    //const res = ((totalCorrect ) * 100) / totalCards;
+
+    var outOf = totalCards
+    var value = totalCorrect
+    var result = (value * 100) / outOf;
+
+    let { animCard } = this.state.animCard;
     const { navigate } = this.props.navigation;
     console.log(this.props.navigation)
+
+    let response = null
+    if(this.state.cCard > 0 && this.state.quizCompleted === false){
+
+      if(this.state.answer === false){
+        response = <Text>You fool that answer is wrong. Try again next time</Text>
+      }else{
+        response = <Text>You are truly a genius, that is indeed correct!</Text>
+      }
+
+     
+
+    }
+
     return(
         <View style={{flex:1}}>
 
@@ -183,20 +253,25 @@ class QuizView extends Component {
                   </DeckItem_Title>
               </DeckItem>
 
-
-              <View style={styles.content}>
+              <View
+                style={{  
+                  position:'relative',
+                  perspective: 1000
+                }}
+              >
+             {/* // <View style={styles.content}> */}
 
                 {quizCompleted 
                 ?
 
                 
                 <View>
-                  { ( totalCorrect + 1 ) === totalCards 
+                  { ( totalCorrect ) === totalCards 
                   ?
                   <View>
                     <DeckItem>
                       <DeckItem_Title><Text>Quiz Complete</Text></DeckItem_Title>
-                      <DeckItem_Title><Text>You scored {res} %</Text></DeckItem_Title>
+                      <DeckItem_Title><Text>You scored {result} %</Text></DeckItem_Title>
                       <DeckItem_Title><Text>You merked this one.</Text></DeckItem_Title>
                       <TouchableOpacity 
                       onPress={() =>
@@ -210,7 +285,7 @@ class QuizView extends Component {
                   :
                   <View>
                     <DeckItem_Title><Text>Quiz Complete</Text></DeckItem_Title>
-                    <DeckItem_Title><Text>You scored {res} %</Text></DeckItem_Title>
+                    <DeckItem_Title><Text>You scored {result} %</Text></DeckItem_Title>
                     <DeckItem_Title><Text>You flunked dog. </Text></DeckItem_Title>
                     <TouchableOpacity onPress={() => this.reset()}>
                       <Text>Try again</Text>
@@ -221,40 +296,45 @@ class QuizView extends Component {
 
                 </View>
                 :
-                <View style={[styles.card]} key={cards[cCard]} >
-                        
-                        {status
-                        ?
-                        <View>
-                          <Title>{cards[cCard].answer}</Title>
-                          <Text >{cards[cCard].TF}</Text>
-                          <TouchableOpacity style={[styles.button]} onPress={() =>this.toggleStatus()}><Text>Show Question</Text></TouchableOpacity> 
-                          </View>
-                        :
-                        <View>
+                <Animated.View
+                  style={{    
+  
+                    transform: [
+                      {rotateY: this.state.animCard}
+                    ],
+                    perspective: 1000
+                  }}
+                >
+                <CardCard>
+                        <CardContentWrap>
+                        {this.state.status  ?
+              
+                          <CardAnswer>
+                            <Title>{cards[cCard].answer}</Title>
+                            <Text >{cards[cCard].TF}</Text>
+                            <TouchableOpacity style={[styles.button]} onPress={() =>this.toggleStatus()}><Text>Show Question</Text></TouchableOpacity> 
+                          </CardAnswer>
+                  :
+                        <CardQuestion>
                           <Title>{cards[cCard].question}</Title>
                           <Text >{cards[cCard].TF}</Text>
                           <TouchableOpacity style={[styles.button]} onPress={() => this.toggleStatus()}><Text>Show Answer</Text></TouchableOpacity> 
-                          </View>
+                        </CardQuestion>
                         }
-                      
-                </View>
+                      </CardContentWrap>
+                  </CardCard>
+                </Animated.View>
                 }
               </View>
 
 
+              {/* <View>
+                <Text>
+                 {'total cards' + totalCards + '|' + 'total coreect' + totalCorrect + '|' + 'curr' + cCard }  
+                 </Text>          
+              </View> */}
               <View>
-                <Text>{this.state.totalCorrect} - {this.state.totalCards}</Text>
-              </View>
-              
-              
-              <View>
-                      {this.state.answer === false
-                      ?
-                      <Text>You foolish fool that answer is wrong. Try again next time</Text>
-                      :
-                      <Text>You are truly a genius, that is indeed correct!</Text>
-                      }                
+                 {response}            
               </View>
 
               <View style={styles.footer}>
@@ -297,8 +377,7 @@ const styles = StyleSheet.create({
       height: 1
     },
     shadowOpacity:0.5,
-    transform: [{ rotateY: JSON.stringify(this.rotY)+ 'deg'}]
-   // transform:rotateY(JSON.stringify(this.rotY)+ 'deg')
+    transformOrigin:0,
   },
 
   label: {

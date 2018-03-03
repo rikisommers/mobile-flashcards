@@ -13,16 +13,19 @@ import Card from './Card'
 import DeckView from './DeckView'
 import { AsyncStorage } from 'react-native'
 import { APIgetDecks } from '../utils/api'
+import { STORAGE_KEY} from '../utils/decks'
 import { StackNavigator } from 'react-navigation'
 
 class DeckListView extends Component {
  
     state = {
+        active: false,
         decks:{}
     } 
     
     componentDidMount(){
-        
+       
+
         APIgetDecks().then((res) => {
             res === null ?
             this.setState({decks:{}})
@@ -30,16 +33,15 @@ class DeckListView extends Component {
             this.setState({decks:res})
         })
 
-    }
+        
 
+    }
 
 
     render() {
         const { navigate } = this.props.navigation;
         const decks = this.state.decks
         let decksArr = Object.keys(decks).map((key) => decks[key])
-        
-  
 
         return(
             

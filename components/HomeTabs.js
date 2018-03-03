@@ -5,13 +5,18 @@ import { purple, white } from '../utils/colors'
 import DeckListView from './DeckListView'
 import AddDeckView from './AddDeckView'
 
+
+
 const HomeTabs = TabNavigator({
+
+  
     DeckListView: {
       screen: DeckListView,
       navigationOptions: {
         tabBarLabel: 'Deck List',
         tabBarIcon: ({ tintColor }) => <Entypo name='documents' size={30} color={tintColor} />
       },
+
     },
     AddDeckView: {
       screen: AddDeckView,
@@ -25,5 +30,7 @@ const HomeTabs = TabNavigator({
       header: null
     }
   })
+  
+  console.log('tabs props',this.props)
 
   export default HomeTabs

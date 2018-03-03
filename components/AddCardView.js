@@ -32,9 +32,6 @@ font-size:20px;
 `
 
 
-
-
-
 function SubmitBtn ({ onPress }) {
     return (
       <TouchableOpacity
@@ -83,7 +80,6 @@ class AddCardView extends Component {
           }
 
     }
-    //onValueChange={(itemValue, itemIndex) => this.setState({answer: itemValue})}
 
 
 
@@ -92,19 +88,18 @@ class AddCardView extends Component {
       let deck = this.props.navigation.state.params.deck.title
       let card = this.state
     let theDeck = this.props.navigation.state.params.deck
-      console.log('on submit deck',deck)  
-      console.log('on submit deck',card)  
+    //   console.log('on submit deck',deck)  
+    //   console.log('on submit deck',card)  
       
-      submitCard({ deck,card })
-      this.setState({question:'',answer:0})
-      this.props.navigation.navigate('DeckView',{ theDeck })
+      submitCard({ deck,card });
+      this.setState({question:'',answer:0});
+
+      this.props.navigation.navigate('DeckListView');
    
     }
 
     componentDidMount(){
-//APIclearDecks()
-      console.log('add new p',this.props)
-   
+       console.log('add new p',this.props)
     }
 
     render() {
